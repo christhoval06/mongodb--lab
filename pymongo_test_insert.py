@@ -3,9 +3,9 @@ from dateutil import parser
 
 from pymongo_get_database import get_database
 
-dbname = get_database()
+dbname = get_database('films')
 
-collection_name = dbname["movies"]
+collection_name = dbname["foods"]
 
 
 expiry_date = '2021-07-13T00:00:00.000Z'

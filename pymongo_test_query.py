@@ -4,11 +4,11 @@ from pymongo_get_database import get_database
 
 dbname = get_database()
  
-# Retrieve a collection named "user_1_items" from database
-collection_name = dbname["movies"]
+# Retrieve a collection named "foods" from database
+collection_name = dbname["foods"]
  
-# item_details = collection_name.find()
-item_details = collection_name.find({"genres" : "Romance"})
+item_details = collection_name.find()
+# item_details = collection_name.find({"genres" : "Romance"})
 # convert the dictionary objects to dataframe
 items_df = DataFrame(item_details)
 
