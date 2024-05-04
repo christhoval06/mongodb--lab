@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  api: &api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: mongodblab--api
+    container_name: mongodblab--api
+    command: poetry run python -mhttp.server 8082
+    ports:
+      - '8082:8082'
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    networks:
+      - mongodblab__network
+  mongodb:
+    container_name: mongodblab--db
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodblab-data:/data/db
+      - ./docker/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=labs
+    networks:
+      - mongodblab__network
+    restart: unless-stopped
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongodblab--express
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=admin
+      - ME_CONFIG_BASICAUTH_USERNAME=root
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+      - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      - mongodb
+    networks:
+      - mongodblab__network
+    ports:
+      - 8081:8081
+    restart: unless-stopped
+
+volumes:
+  mongodblab-data:
+    name: mongodblab-data
+
+networks:
+  mongodblab__network:
+    driver: bridge
